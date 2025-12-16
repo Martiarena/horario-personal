@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<title>Calendario 2026</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			line-height: 1.6;
+		}
+		strong {
+			font-size: 1.1em;
+		}
+	</style>
+</head>
+<body>
+
+<h1>Días del año 2026</h1>
+
+<ul id="lista"></ul>
+
+<script>
+	const lista = document.getElementById("lista");
+
+	const diasSemana = [
+		"Domingo",
+		"Lunes",
+		"Martes",
+		"Miércoles",
+		"Jueves",
+		"Viernes",
+		"Sábado"
+	];
+
+	const meses = [
+		"Enero",
+		"Febrero",
+		"Marzo",
+		"Abril",
+		"Mayo",
+		"Junio",
+		"Julio",
+		"Agosto",
+		"Septiembre",
+		"Octubre",
+		"Noviembre",
+		"Diciembre"
+	];
+
+	function randomLetra(opciones) {
+		return opciones[Math.floor(Math.random() * opciones.length)];
+	}
+
+	let fecha = new Date(2026, 0, 1);
+	const fin = new Date(2027, 0, 1);
+
+	while (fecha < fin) {
+		const diaSemana = fecha.getDay(); // 0 = Domingo, 6 = Sábado
+		const esFinDeSemana = diaSemana === 0 || diaSemana === 6;
+
+		const letra = esFinDeSemana
+			? randomLetra(["P", "J"])
+			: randomLetra(["A", "J"]);
+
+		const texto = `${diasSemana[diaSemana]} ${fecha.getDate()} de ${meses[fecha.getMonth()]}`;
+
+		const li = document.createElement("li");
+		li.innerHTML = `${texto}: <strong>${letra}</strong>`;
+
+		lista.appendChild(li);
+
+		fecha.setDate(fecha.getDate() + 1);
+	}
+</script>
+
+</body>
+</html>
