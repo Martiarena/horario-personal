@@ -2,31 +2,30 @@
 <html lang="es">
 <head>
 	<meta charset="UTF-8">
-	<title>Calendario dinámico</title>
+	<title>Horario anual</title>
 	<style>
 		body {
-			font-family: Arial, sans-serif;
-			line-height: 1.6;
+			font-family: monospace;
+			white-space: pre-wrap;
+			line-height: 1.4;
 		}
-		label, button {
-			margin-right: 8px;
+		.generar {
+			display: flex;
+		}
+		h1, h2, h3, h4, h5, h6 {
+			margin: 0;
+		}
+		textarea {
+			width: 100%;
+			height: 70vh;
 		}
 	</style>
 </head>
-<body>
-
-<h1>Calendario por año</h1>
-
-<label for="yearInput">Año:</label>
-<input type="number" id="yearInput" min="1900" max="2100">
-<button id="generar">Generar</button>
-
-<ul id="lista"></ul>
-
+<body><h1>Mis actividades por año</h1>
+<div><label for="yearInput"><strong>Año:</strong></label> <input type="number" id="yearInput" min="1900" max="2100"> <button id="generar">Generar</button></div>
+<textarea id="output"></textarea>
 <script>
-	const lista = document.getElementById("lista");
-	const yearInput = document.getElementById("yearInput");
-	const btnGenerar = document.getElementById("generar");
+	const output = document.getElementById("output");
 
 	const diasSemana = [
 		"Domingo",
@@ -39,59 +38,109 @@
 	];
 
 	const meses = [
-		"Enero",
-		"Febrero",
-		"Marzo",
-		"Abril",
-		"Mayo",
-		"Junio",
-		"Julio",
-		"Agosto",
-		"Septiembre",
-		"Octubre",
-		"Noviembre",
-		"Diciembre"
+		"enero",
+		"febrero",
+		"marzo",
+		"abril",
+		"mayo",
+		"junio",
+		"julio",
+		"agosto",
+		"septiembre",
+		"octubre",
+		"noviembre",
+		"diciembre"
 	];
 
 	function randomLetra(opciones) {
 		return opciones[Math.floor(Math.random() * opciones.length)];
 	}
 
-	function generarCalendario(year) {
-		lista.innerHTML = "";
+	function getLetra(diaSemana) {
+		const esFinDeSemana = diaSemana === 0 || diaSemana === 6;
+		return esFinDeSemana
+			? randomLetra(["P", "J"])
+			: randomLetra(["A", "J"]);
+	}
 
+	function generarTexto(year) {
+		let texto = "";
 		let fecha = new Date(year, 0, 1);
+
+		// Alinear al lunes
+		while (fecha.getDay() !== 1) {
+			fecha.setDate(fecha.getDate() - 1);
+		}
+
+		let semana = 1;
 		const fin = new Date(year + 1, 0, 1);
 
 		while (fecha < fin) {
-			const diaSemana = fecha.getDay();
-			const esFinDeSemana = diaSemana === 0 || diaSemana === 6;
+			texto += "++++++++++++++++++++++++++++++++++++++++++++ Semana " + semana + "\n";
+			texto += "Publicación semanal de True Role Dreams: [     ]\n";
 
-			const letra = esFinDeSemana
-				? randomLetra(["P", "J"])
-				: randomLetra(["A", "J"]);
+			for (let i = 0; i < 7; i++) {
+				const dia = fecha.getDay();
 
-			const texto = `${diasSemana[diaSemana]} ${fecha.getDate()} de ${meses[fecha.getMonth()]}`;
+				if (fecha.getFullYear() === year) {
+					const letra = getLetra(dia);
+					const lineaFecha =
+						`${diasSemana[dia]} ${fecha.getDate()} de ${meses[fecha.getMonth()]}`;
 
-			const li = document.createElement("li");
-			li.innerHTML = `${texto}: <strong>${letra}</strong>`;
+					texto += "---------- " + lineaFecha + ": " + letra + "\n";
 
-			lista.appendChild(li);
+					// BLOQUE DE TAREAS FIJAS
+					if (dia >= 1 && dia <= 5) { // Lunes a Viernes
+						texto += "x Escribir para redes: 40 min\n";
+						if (dia !== 2 && dia !== 4) {
+							texto += "x Game Dev\n";
+							if (dia === 5) {
+								texto += "x Game Dev (Alterno)\n";
+							}else{
+								texto += "x Game Dev\n";
+							}
+						}
+						texto += "Trabajo [8 horas] (Inglés 15 min)\n";
+						if (dia === 2 || dia === 4) {
+							texto += "Trabajo [1 hora]\n";
+						}
+					}
 
-			fecha.setDate(fecha.getDate() + 1);
+					if (dia === 6) { // Sábado
+						texto += "x Escribir para redes: 40 min\n";
+						texto += "Trabajo [6 horas]\n";
+						texto += "x Hora Libre\n";
+					}
+
+					if (dia === 0) { // Domingo
+						texto += "x Escribir para redes: 40 min\n";
+						texto += "x Kasumi Cuidados\n";
+					}
+				}
+
+				fecha.setDate(fecha.getDate() + 1);
+			}
+
+			semana++;
 		}
+
+		return texto;
 	}
 
-	// Año actual por defecto
-	const currentYear = new Date().getFullYear();
-	yearInput.value = currentYear;
-	generarCalendario(currentYear);
 
-	// Generar al presionar botón
+	const yearInput = document.getElementById("yearInput");
+	const btnGenerar = document.getElementById("generar");
+
+	// Año actual por defecto
+	const yearActual = new Date().getFullYear();
+	yearInput.value = yearActual;
+	output.value = generarTexto(yearActual);
+
+	// Regenerar al cambiar año
 	btnGenerar.addEventListener("click", () => {
 		const year = parseInt(yearInput.value);
 		if (!isNaN(year)) {
-			generarCalendario(year);
+			output.value = generarTexto(year);
 		}
 	});
 </script>
